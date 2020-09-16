@@ -17,60 +17,15 @@ int main()
 
     struct Snake player = {};
     player.tile_id = 4;
-    int snake_body_count = 0;
     double player_angle = 90;
 
-    for (int i = 0; i < level.length; i++)
-    {
-        int tile_id = level.tiles[i];
+    const int player_level_index = level_get_tile_index(&level, player.tile_id);
+    player.x = player_level_index % level.width;
+    player.y = player_level_index / level.width;
 
-        if (tile_id == player.tile_id)
-        {
-            player.x = i % level.width;
-            player.y = i / level.width;
-        }
-        else if (tile_id == 3)
-        {
-            snake_body_count++;
-        }
-    }
-
+    const int snake_body_count = level_get_tile_count(&level, player.tile_id - 1);
     struct Snake snake_bodies[snake_body_count];
-    int snake_body_i = 0;
-    for (int i = 0; i < level.length; i++)
-    {
-        if (level.tiles[i] == 3)
-        {
-            struct Snake body = {};
-            body.tile_id = 3;
-            body.x = i % level.width;
-            body.y = i / level.width;
-            snake_bodies[snake_body_i++] = body;
-        }
-    }
-
-    struct Snake *snake = &player;
-    while (snake)
-    {
-        for (int i = 0; i < snake_body_count; i++)
-        {
-            struct Snake *body = &snake_bodies[i];
-            int x_diff = abs(snake->x - body->x);
-            int y_diff = abs(snake->y - body->y);
-            int is_adjacent = x_diff + y_diff == 1;
-            if (is_adjacent && !body->child)
-            {
-                snake->child = body;
-                if (i % 2 == 0)
-                {
-                    snake->child->tile_id += 2;
-                    level_set_tile(&level, snake->child->x, snake->child->y, snake->child->tile_id);
-                }
-                break;
-            }
-        }
-        snake = snake->child;
-    }
+    snake_find_bodies(&player, snake_bodies, &level);
 
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER);
 

@@ -51,3 +51,24 @@ int level_set_tile(struct Level *level, int x, int y, int tile_id)
 
     return 1;
 }
+
+int level_get_tile_index(struct Level *level, int tile_id)
+{
+    for (int i = 0; i < level->length; i++)
+    {
+        if (level->tiles[i] == tile_id)
+            return i;
+    }
+    return -1;
+}
+
+int level_get_tile_count(struct Level *level, int tile_id)
+{
+    int tile_count = 0;
+    for (int i = 0; i < level->length; i++)
+    {
+        if (level->tiles[i] == tile_id)
+            tile_count++;
+    }
+    return tile_count;
+}
