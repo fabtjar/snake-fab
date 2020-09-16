@@ -15,9 +15,7 @@ struct Level level_create(char *level_file)
         for (int i = 0; i < buffer_length; i++)
         {
             char c = buffer[i];
-            if (c == '\n')
-                break;
-            if (c == ' ')
+            if (c == ' ' || c == '\n')
                 continue;
             level_tiles[level_i++] = c;
         }
