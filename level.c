@@ -11,7 +11,8 @@ struct Level level_create(char *level_file)
     while (!feof(file))
     {
         fgets(buffer, 255, file);
-        for (int i = 0; i < strlen(buffer); i++)
+        int buffer_length = strlen(buffer);
+        for (int i = 0; i < buffer_length; i++)
         {
             char c = buffer[i];
             if (c == '\n')
