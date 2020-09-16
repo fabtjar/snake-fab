@@ -156,7 +156,6 @@ int main()
         }
 
         int is_on_ground = 0;
-        int snake_found = 1;
         struct Snake *snake = &player;
         while (snake && !is_on_ground)
         {
