@@ -1,0 +1,54 @@
+#include "level.h"
+#include <stdio.h>
+#include <string.h>
+
+struct Level level_create(char *level_file)
+{
+    FILE *file = fopen(level_file, "r");
+    char buffer[255];
+    char level_tiles[255];
+    int level_i = 0;
+    while (!feof(file))
+    {
+        fgets(buffer, 255, file);
+        for (int i = 0; i < strlen(buffer); i++)
+        {
+            char c = buffer[i];
+            if (c == '\n')
+                break;
+            if (c == ' ')
+                continue;
+            level_tiles[level_i++] = c;
+        }
+    }
+    fclose(file);
+    level_tiles[level_i] = '\0';
+    struct Level level;
+    level.length = strlen(level_tiles);
+    level.width = 10;
+
+    for (int i = 0; i < level.length; i++)
+    {
+        level.tiles[i] = level_tiles[i] - '0';
+    }
+
+    return level;
+}
+
+int level_get_tile(struct Level *level, int x, int y)
+{
+    if (x < 0 || x > level->width - 1 || y < 0 || y > level->length / level->width - 1)
+        return -1;
+
+    return level->tiles[x % level->width + y * level->width];
+}
+
+int level_set_tile(struct Level *level, int x, int y, int tile_id)
+{
+    if (x < 0 || x > level->width - 1 || y < 0 || y > level->length / level->width - 1)
+        return 0;
+
+    level->tiles[x % level->width + y * level->width] = tile_id;
+
+    return 1;
+}
