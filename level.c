@@ -1,4 +1,5 @@
 #include "level.h"
+#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -42,14 +43,14 @@ int level_get_tile(struct Level *level, int x, int y)
     return level->tiles[x % level->width + y * level->width];
 }
 
-int level_set_tile(struct Level *level, int x, int y, int tile_id)
+bool level_set_tile(struct Level *level, int x, int y, int tile_id)
 {
     if (x < 0 || x > level->width - 1 || y < 0 || y > level->length / level->width - 1)
-        return 0;
+        return false;
 
     level->tiles[x % level->width + y * level->width] = tile_id;
 
-    return 1;
+    return true;
 }
 
 int level_get_tile_index(struct Level *level, int tile_id)

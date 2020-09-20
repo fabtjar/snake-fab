@@ -2,6 +2,7 @@
 #include "snake.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <stdbool.h>
 #include <stdio.h>
 
 #define GAME_WIDTH 200
@@ -46,7 +47,7 @@ int main()
 
     int input_x, input_y;
 
-    int quit = 0;
+    bool quit = false;
     while (!quit)
     {
         input_x = input_y = 0;
@@ -57,7 +58,7 @@ int main()
             switch (event.type)
             {
             case SDL_QUIT:
-                quit = 1;
+                quit = true;
                 break;
             case SDL_KEYDOWN:
                 switch (event.key.keysym.scancode)
@@ -87,12 +88,12 @@ int main()
             }
         }
 
-        int is_on_ground = 0;
+        bool is_on_ground = false;
         struct Snake *snake = &player;
         while (snake && !is_on_ground)
         {
             if (level_get_tile(&level, snake->x, snake->y + 1) == 1)
-                is_on_ground = 1;
+                is_on_ground = true;
             snake = snake->child;
         }
 
@@ -120,7 +121,7 @@ int main()
             int move_x = player.x + input_x;
             int move_y = player.y + input_y;
 
-            int snake_moved = snake_move(&player, move_x, move_y, &level);
+            bool snake_moved = snake_move(&player, move_x, move_y, &level);
             if (snake_moved)
             {
                 if (input_x > 0)
