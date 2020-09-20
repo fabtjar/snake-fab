@@ -12,21 +12,32 @@
 #define JSON_BUFFER_SIZE 2048
 #define TILE_SIZE 20
 
+#define PLAYER_DIR_UP 0
+#define PLAYER_DIR_DOWN 180
+#define PLAYER_DIR_LEFT 270
+#define PLAYER_DIR_RIGHT 90
+
+struct Player
+{
+    struct Snake head;
+    int angle;
+};
+
 int main()
 {
     struct Level level = level_create("assets/level.map");
 
-    struct Snake player = {};
-    player.tile_id = 4;
-    double player_angle = 90;
+    struct Player player = {};
+    player.head.tile_id = 4;
+    player.angle = PLAYER_DIR_RIGHT;
 
-    const int player_level_index = level_get_tile_index(&level, player.tile_id);
-    player.x = player_level_index % level.width;
-    player.y = player_level_index / level.width;
+    const int player_level_index = level_get_tile_index(&level, player.head.tile_id);
+    player.head.x = player_level_index % level.width;
+    player.head.y = player_level_index / level.width;
 
-    const int snake_body_count = level_get_tile_count(&level, player.tile_id - 1);
+    const int snake_body_count = level_get_tile_count(&level, player.head.tile_id - 1);
     struct Snake snake_bodies[snake_body_count];
-    snake_find_bodies(&player, snake_bodies, &level);
+    snake_find_bodies(&player.head, snake_bodies, &level);
 
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER);
 
@@ -89,7 +100,7 @@ int main()
         }
 
         bool is_on_ground = false;
-        struct Snake *snake = &player;
+        struct Snake *snake = &player.head;
         while (snake && !is_on_ground)
         {
             if (level_get_tile(&level, snake->x, snake->y + 1) == 1)
@@ -100,13 +111,13 @@ int main()
         if (!is_on_ground)
         {
             SDL_Delay(100);
-            struct Snake *snake = &player;
+            struct Snake *snake = &player.head;
             while (snake)
             {
                 level_set_tile(&level, snake->x, snake->y, 0);
                 snake = snake->child;
             }
-            snake = &player;
+            snake = &player.head;
             while (snake)
             {
                 snake->y++;
@@ -118,20 +129,20 @@ int main()
         {
             if (input_x != 0)
                 input_y = 0;
-            int move_x = player.x + input_x;
-            int move_y = player.y + input_y;
+            int move_x = player.head.x + input_x;
+            int move_y = player.head.y + input_y;
 
-            bool snake_moved = snake_move(&player, move_x, move_y, &level);
+            bool snake_moved = snake_move(&player.head, move_x, move_y, &level);
             if (snake_moved)
             {
                 if (input_x > 0)
-                    player_angle = 90;
+                    player.angle = PLAYER_DIR_RIGHT;
                 else if (input_x < 0)
-                    player_angle = 270;
+                    player.angle = PLAYER_DIR_LEFT;
                 else if (input_y > 0)
-                    player_angle = 180;
+                    player.angle = PLAYER_DIR_DOWN;
                 else if (input_y < 0)
-                    player_angle = 0;
+                    player.angle = PLAYER_DIR_UP;
             }
         }
 
@@ -148,8 +159,8 @@ int main()
             src_rect.x = tile_id % texture_tile_width * TILE_SIZE;
             src_rect.y = tile_id / texture_tile_width * TILE_SIZE;
 
-            if (tile_id == player.tile_id)
-                SDL_RenderCopyEx(renderer, texture, &src_rect, &dest_rect, player_angle, NULL, SDL_FLIP_NONE);
+            if (tile_id == player.head.tile_id)
+                SDL_RenderCopyEx(renderer, texture, &src_rect, &dest_rect, player.angle, NULL, SDL_FLIP_NONE);
             else
                 SDL_RenderCopy(renderer, texture, &src_rect, &dest_rect);
         }
