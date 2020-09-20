@@ -1,4 +1,5 @@
 #include "level.h"
+#include "player.h"
 #include "snake.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
@@ -17,27 +18,17 @@
 #define PLAYER_DIR_LEFT 270
 #define PLAYER_DIR_RIGHT 90
 
-struct Player
-{
-    struct Snake head;
-    int angle;
-};
+#define PLAYER_SNAKE_BODY_MAX 10
 
 int main()
 {
     struct Level level = level_create("assets/level.map");
 
-    struct Player player = {};
-    player.head.tile_id = 4;
-    player.angle = PLAYER_DIR_RIGHT;
+    struct Player player;
+    player_create(&player, 4);
 
-    const int player_level_index = level_get_tile_index(&level, player.head.tile_id);
-    player.head.x = player_level_index % level.width;
-    player.head.y = player_level_index / level.width;
-
-    const int snake_body_count = level_get_tile_count(&level, player.head.tile_id - 1);
-    struct Snake snake_bodies[snake_body_count];
-    snake_find_bodies(&player.head, snake_bodies, &level);
+    struct Snake snake_bodies[PLAYER_SNAKE_BODY_MAX];
+    player_load_from_level(&player, snake_bodies, &level);
 
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER);
 
@@ -99,51 +90,16 @@ int main()
             }
         }
 
-        bool is_on_ground = false;
-        struct Snake *snake = &player.head;
-        while (snake && !is_on_ground)
-        {
-            if (level_get_tile(&level, snake->x, snake->y + 1) == 1)
-                is_on_ground = true;
-            snake = snake->child;
-        }
+        bool is_on_ground = player_check_on_ground(&player, &level);
 
         if (!is_on_ground)
         {
             SDL_Delay(100);
-            struct Snake *snake = &player.head;
-            while (snake)
-            {
-                level_set_tile(&level, snake->x, snake->y, 0);
-                snake = snake->child;
-            }
-            snake = &player.head;
-            while (snake)
-            {
-                snake->y++;
-                level_set_tile(&level, snake->x, snake->y, snake->tile_id);
-                snake = snake->child;
-            }
+            player_fall(&player, &level);
         }
         else if (input_x != 0 || input_y != 0)
         {
-            if (input_x != 0)
-                input_y = 0;
-            int move_x = player.head.x + input_x;
-            int move_y = player.head.y + input_y;
-
-            bool snake_moved = snake_move(&player.head, move_x, move_y, &level);
-            if (snake_moved)
-            {
-                if (input_x > 0)
-                    player.angle = PLAYER_DIR_RIGHT;
-                else if (input_x < 0)
-                    player.angle = PLAYER_DIR_LEFT;
-                else if (input_y > 0)
-                    player.angle = PLAYER_DIR_DOWN;
-                else if (input_y < 0)
-                    player.angle = PLAYER_DIR_UP;
-            }
+            player_move(&player, input_x, input_y, &level);
         }
 
         for (int i = 0; i < level.length; i++)
