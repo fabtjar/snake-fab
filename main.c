@@ -18,17 +18,22 @@
 #define PLAYER_DIR_LEFT 270
 #define PLAYER_DIR_RIGHT 90
 
+#define PLAYER_COUNT 2
 #define PLAYER_SNAKE_BODY_MAX 10
 
 int main()
 {
     struct Level level = level_create("assets/level.map");
 
-    struct Player player;
-    player_create(&player, 4);
+    struct Player players[PLAYER_COUNT];
+    for (int i = 0; i < PLAYER_COUNT; i++)
+        player_create(&players[i], 4 + i * 3);
 
-    struct Snake snake_bodies[PLAYER_SNAKE_BODY_MAX];
-    player_load_from_level(&player, snake_bodies, &level);
+    int active_player = 0;
+
+    struct Snake snake_bodies[PLAYER_COUNT][PLAYER_SNAKE_BODY_MAX];
+    for (int i = 0; i < PLAYER_COUNT; i++)
+        player_load_from_level(&players[i], snake_bodies[i], &level);
 
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER);
 
@@ -90,16 +95,25 @@ int main()
             }
         }
 
-        bool is_on_ground = player_check_on_ground(&player, &level);
+        bool all_on_ground = true;
+        for (int i = 0; i < PLAYER_COUNT; i++)
+        {
+            if (!player_check_on_ground(&players[i], &level))
+            {
+                all_on_ground = false;
+                break;
+            }
+        }
 
-        if (!is_on_ground)
+        if (!all_on_ground)
         {
             SDL_Delay(100);
-            player_fall(&player, &level);
+            for (int i = 0; i < PLAYER_COUNT; i++)
+                player_fall(&players[i], &level);
         }
         else if (input_x != 0 || input_y != 0)
         {
-            player_move(&player, input_x, input_y, &level);
+            player_move(&players[active_player], input_x, input_y, &level);
         }
 
         for (int i = 0; i < level.length; i++)
@@ -115,9 +129,17 @@ int main()
             src_rect.x = tile_id % texture_tile_width * TILE_SIZE;
             src_rect.y = tile_id / texture_tile_width * TILE_SIZE;
 
-            if (tile_id == player.head.tile_id)
-                SDL_RenderCopyEx(renderer, texture, &src_rect, &dest_rect, player.angle, NULL, SDL_FLIP_NONE);
-            else
+            bool is_player_head = false;
+            for (int i = 0; i < PLAYER_COUNT; i++)
+            {
+                if (tile_id == players[i].head.tile_id)
+                {
+                    SDL_RenderCopyEx(renderer, texture, &src_rect, &dest_rect, players[i].angle, NULL, SDL_FLIP_NONE);
+                    is_player_head = true;
+                    break;
+                }
+            }
+            if (!is_player_head)
                 SDL_RenderCopy(renderer, texture, &src_rect, &dest_rect);
         }
         SDL_RenderPresent(renderer);

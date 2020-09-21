@@ -23,18 +23,28 @@ void player_load_from_level(struct Player *player, struct Snake snake_bodies[], 
     snake_find_bodies(&player->head, snake_bodies, level);
 }
 
+bool player_is_own_tile(struct Player *player, int tile_id)
+{
+    int player_tile_id = player->head.tile_id;
+    return tile_id >= player_tile_id - 1 && tile_id <= player_tile_id + 1;
+}
+
 bool player_check_on_ground(struct Player *player, struct Level *level)
 {
     bool on_ground = false;
     struct Snake *snake = &player->head;
     while (snake && !on_ground)
     {
-        if (level_get_tile(level, snake->x, snake->y + 1) == 1)
-            on_ground = true;
+        int under_tile_id = level_get_tile(level, snake->x, snake->y + 1);
+        if (under_tile_id != 0 && !player_is_own_tile(player, under_tile_id))
+        {
+            player->on_ground = true;
+            return true;
+        }
         snake = snake->child;
     }
-    player->on_ground = on_ground;
-    return on_ground;
+    player->on_ground = false;
+    return false;
 }
 
 void player_fall(struct Player *player, struct Level *level)
