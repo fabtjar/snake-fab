@@ -13,13 +13,6 @@
 #define JSON_BUFFER_SIZE 2048
 #define TILE_SIZE 20
 
-#define PLAYER_DIR_UP 0
-#define PLAYER_DIR_DOWN 180
-#define PLAYER_DIR_LEFT 270
-#define PLAYER_DIR_RIGHT 90
-
-#define PLAYER_SNAKE_BODY_MAX 10
-
 int main()
 {
     struct Level level = level_create("assets/level.map");

@@ -3,6 +3,12 @@
 
 #include "snake.h"
 
+#define PLAYER_DIR_UP 0
+#define PLAYER_DIR_DOWN 180
+#define PLAYER_DIR_LEFT 270
+#define PLAYER_DIR_RIGHT 90
+
+#define PLAYER_SNAKE_BODY_MAX 10
 #define PLAYER_COUNT 2
 
 struct Player

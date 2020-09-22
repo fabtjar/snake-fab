@@ -2,11 +2,6 @@
 #include "level.h"
 #include <stdbool.h>
 
-#define PLAYER_DIR_UP 0
-#define PLAYER_DIR_DOWN 180
-#define PLAYER_DIR_LEFT 270
-#define PLAYER_DIR_RIGHT 90
-
 bool player_push(struct Player *player, int dir_x, int dir_y, struct Level *level);
 
 void player_create(struct Player *player, int tile_id)
