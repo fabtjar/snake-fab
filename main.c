@@ -18,14 +18,12 @@
 #define PLAYER_DIR_LEFT 270
 #define PLAYER_DIR_RIGHT 90
 
-#define PLAYER_COUNT 2
 #define PLAYER_SNAKE_BODY_MAX 10
 
 int main()
 {
     struct Level level = level_create("assets/level.map");
 
-    struct Player players[PLAYER_COUNT];
     for (int i = 0; i < PLAYER_COUNT; i++)
         player_create(&players[i], 4 + i * 3);
 
@@ -113,7 +111,7 @@ int main()
         }
         else if (input_x != 0 || input_y != 0)
         {
-            player_move(&players[active_player], input_x, input_y, &level);
+            player_update(&players[active_player], input_x, input_y, &level);
         }
 
         for (int i = 0; i < level.length; i++)

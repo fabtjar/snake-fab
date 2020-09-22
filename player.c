@@ -7,6 +7,8 @@
 #define PLAYER_DIR_LEFT 270
 #define PLAYER_DIR_RIGHT 90
 
+bool player_push(struct Player *player, int dir_x, int dir_y, struct Level *level);
+
 void player_create(struct Player *player, int tile_id)
 {
     player->head.tile_id = tile_id;
@@ -27,6 +29,14 @@ bool player_is_own_tile(struct Player *player, int tile_id)
 {
     int player_tile_id = player->head.tile_id;
     return tile_id >= player_tile_id - 1 && tile_id <= player_tile_id + 1;
+}
+
+int player_get_from_tile(int tile_id)
+{
+    for (int i = 0; i < PLAYER_COUNT; i++)
+        if (player_is_own_tile(&players[i], tile_id))
+            return i;
+    return -1;
 }
 
 bool player_check_on_ground(struct Player *player, struct Level *level)
@@ -67,15 +77,15 @@ void player_fall(struct Player *player, struct Level *level)
     }
 }
 
-void player_move(struct Player *player, int input_x, int input_y, struct Level *level)
+void player_update(struct Player *player, int input_x, int input_y, struct Level *level)
 {
     if (input_x != 0)
         input_y = 0;
     int move_x = player->head.x + input_x;
     int move_y = player->head.y + input_y;
 
-    bool snake_moved = snake_move(&player->head, move_x, move_y, level);
-    if (snake_moved)
+    bool moved = player_move(player, move_x, move_y, level);
+    if (moved)
     {
         if (input_x > 0)
             player->angle = PLAYER_DIR_RIGHT;
@@ -86,4 +96,59 @@ void player_move(struct Player *player, int input_x, int input_y, struct Level *
         else if (input_y < 0)
             player->angle = PLAYER_DIR_UP;
     }
+}
+
+bool player_move(struct Player *player, int x, int y, struct Level *level)
+{
+    int tile_id = level_get_tile(level, x, y);
+
+    // Can't move into walls.
+    if (tile_id == 1)
+        return false;
+
+    // Check moving into other players.
+    if (tile_id > 1)
+    {
+        // Can't move into self.
+        if (player_is_own_tile(player, tile_id))
+            return false;
+
+        // Move if the other player can move there too.
+        int other_id = player_get_from_tile(tile_id);
+        int dir_x = x - player->head.x;
+        int dir_y = y - player->head.y;
+        if (!player_push(&players[other_id], dir_x, dir_y, level))
+            return false;
+    }
+
+    snake_move(&player->head, x, y, level);
+
+    return true;
+}
+
+bool player_push(struct Player *player, int dir_x, int dir_y, struct Level *level)
+{
+    int tile_id;
+
+    struct Snake *snake = &player->head;
+    while (snake)
+    {
+        tile_id = level_get_tile(level, snake->x + dir_x, snake->y + dir_y);
+        if (tile_id == 0 || player_is_own_tile(player, tile_id))
+            snake = snake->child;
+        else
+            return false;
+    }
+
+    snake = &player->head;
+    while (snake)
+    {
+        level_set_tile(level, snake->x, snake->y, 0);
+        snake->x += dir_x;
+        snake->y += dir_y;
+        level_set_tile(level, snake->x, snake->y, snake->tile_id);
+        snake = snake->child;
+    }
+
+    return true;
 }

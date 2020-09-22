@@ -4,9 +4,6 @@
 
 bool snake_move(struct Snake *snake, int x, int y, struct Level *level)
 {
-    if (level_get_tile(level, x, y) != 0)
-        return false;
-
     int last_x = snake->x;
     int last_y = snake->y;
     level_set_tile(level, last_x, last_y, 0);
