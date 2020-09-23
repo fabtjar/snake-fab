@@ -13,6 +13,9 @@
 #define JSON_BUFFER_SIZE 2048
 #define TILE_SIZE 20
 
+#define FLASH_MAX 255
+#define FLASH_REDUCE 10
+
 int main()
 {
     struct Level level = level_create("assets/level.map");
@@ -21,6 +24,8 @@ int main()
         player_create(&players[i], 4 + i * 3);
 
     int active_player = 0;
+
+    int flash_amout = FLASH_MAX;
 
     struct Snake snake_bodies[PLAYER_COUNT][PLAYER_SNAKE_BODY_MAX];
     for (int i = 0; i < PLAYER_COUNT; i++)
@@ -32,6 +37,8 @@ int main()
 
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     SDL_RenderSetScale(renderer, GAME_SCALE, GAME_SCALE);
+
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
     SDL_Surface *surface = IMG_Load("assets/tiles.png");
     SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
@@ -77,6 +84,10 @@ int main()
                 case SDL_SCANCODE_RIGHT:
                     input_x++;
                     break;
+                case SDL_SCANCODE_SPACE:
+                    active_player = (active_player + 1) % PLAYER_COUNT;
+                    flash_amout = 255;
+                    break;
                 default:
                     break;
                 }
@@ -107,6 +118,12 @@ int main()
             player_update(&players[active_player], input_x, input_y, &level);
         }
 
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, flash_amout);
+        if (flash_amout > 0)
+            flash_amout -= FLASH_REDUCE;
+        if (flash_amout < 0)
+            flash_amout = 0;
+
         for (int i = 0; i < level.length; i++)
         {
             dest_rect.x = i % level.width * TILE_SIZE;
@@ -132,6 +149,9 @@ int main()
             }
             if (!is_player_head)
                 SDL_RenderCopy(renderer, texture, &src_rect, &dest_rect);
+
+            if (player_is_own_tile(&players[active_player], tile_id))
+                SDL_RenderFillRect(renderer, &dest_rect);
         }
         SDL_RenderPresent(renderer);
         SDL_Delay(1000 / 60);
