@@ -9,7 +9,7 @@
 #define PLAYER_DIR_RIGHT 90
 
 #define PLAYER_SNAKE_BODY_MAX 10
-#define PLAYER_COUNT 2
+#define PLAYER_COUNT 3
 
 struct Player
 {

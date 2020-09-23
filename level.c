@@ -18,6 +18,12 @@ struct Level level_create(char *level_file)
             char c = buffer[i];
             if (c == ' ' || c == '\n')
                 continue;
+
+            // 'A' is a place holder for 10 as it doesn't fit in a single char.
+            // Replace with the char after '9' so it can be convert to 10 later on.
+            if (c == 'A')
+                c = ':';
+
             level_tiles[level_i++] = c;
         }
     }
