@@ -53,10 +53,11 @@ void snake_find_bodies(Snake *snake, Snake snake_bodies[], Level *level)
 
         if ((offset_x != 0 || offset_y != 0) && !already_found_body)
         {
-            Snake body = {};
-            body.tile_id = body_tile_id;
-            body.x = body_x;
-            body.y = body_y;
+            Snake body = {
+                .tile_id = body_tile_id,
+                .x = body_x,
+                .y = body_y,
+            };
 
             if (snakes_found % 2 == 0)
             {
