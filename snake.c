@@ -2,7 +2,7 @@
 #include "level.h"
 #include <stdbool.h>
 
-bool snake_move(struct Snake *snake, int x, int y, struct Level *level)
+bool snake_move(Snake *snake, int x, int y, Level *level)
 {
     int last_x = snake->x;
     int last_y = snake->y;
@@ -17,12 +17,12 @@ bool snake_move(struct Snake *snake, int x, int y, struct Level *level)
     return true;
 }
 
-void snake_find_bodies(struct Snake *snake, struct Snake snake_bodies[], struct Level *level)
+void snake_find_bodies(Snake *snake, Snake snake_bodies[], Level *level)
 {
     const int body_tile_id = snake->tile_id - 1;
     int snakes_found = 0;
 
-    struct Snake *parent = snake;
+    Snake *parent = snake;
     while (parent)
     {
         int offset_x = 0;
@@ -43,7 +43,7 @@ void snake_find_bodies(struct Snake *snake, struct Snake snake_bodies[], struct 
         bool already_found_body = 0;
         for (int i = 0; i < snakes_found; i++)
         {
-            struct Snake *body = &snake_bodies[i];
+            Snake *body = &snake_bodies[i];
             if (body->x == body_x && body->y == body_y)
             {
                 already_found_body = true;
@@ -53,7 +53,7 @@ void snake_find_bodies(struct Snake *snake, struct Snake snake_bodies[], struct 
 
         if ((offset_x != 0 || offset_y != 0) && !already_found_body)
         {
-            struct Snake body = {};
+            Snake body = {};
             body.tile_id = body_tile_id;
             body.x = body_x;
             body.y = body_y;

@@ -4,12 +4,12 @@
 #include "level.h"
 #include <stdbool.h>
 
-struct Snake
+typedef struct Snake
 {
     int x, y, tile_id;
     struct Snake *child;
-};
-bool snake_move(struct Snake *snake, int x, int y, struct Level *level);
-void snake_find_bodies(struct Snake *snake, struct Snake snake_bodies[], struct Level *level);
+} Snake;
+bool snake_move(Snake *snake, int x, int y, Level *level);
+void snake_find_bodies(Snake *snake, Snake snake_bodies[], Level *level);
 
 #endif

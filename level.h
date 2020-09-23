@@ -3,16 +3,16 @@
 
 #include <stdbool.h>
 
-struct Level
+typedef struct Level
 {
     int tiles[100];
     int width;
     int length;
-};
-struct Level level_create(char *level_file);
-int level_get_tile(struct Level *level, int x, int y);
-bool level_set_tile(struct Level *level, int x, int y, int tile_id);
-int level_get_tile_index(struct Level *level, int tile_id);
-int level_get_tile_count(struct Level *level, int tile_id);
+} Level;
+Level level_create(char *level_file);
+int level_get_tile(Level *level, int x, int y);
+bool level_set_tile(Level *level, int x, int y, int tile_id);
+int level_get_tile_index(Level *level, int tile_id);
+int level_get_tile_count(Level *level, int tile_id);
 
 #endif

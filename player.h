@@ -11,19 +11,19 @@
 #define PLAYER_SNAKE_BODY_MAX 10
 #define PLAYER_COUNT 3
 
-struct Player
+typedef struct Player
 {
-    struct Snake head;
+    Snake head;
     int angle;
     bool on_ground;
-};
-struct Player players[PLAYER_COUNT];
-void player_create(struct Player *player, int tile_id);
-void player_load_from_level(struct Player *player, struct Snake snake_bodies[], struct Level *level);
-bool player_is_own_tile(struct Player *player, int tile_id);
-bool player_check_on_ground(struct Player *player, struct Level *level);
-void player_fall(struct Player *player, struct Level *level);
-void player_update(struct Player *player, int input_x, int input_y, struct Level *level);
-bool player_move(struct Player *player, int x, int y, struct Level *level);
+} Player;
+Player players[PLAYER_COUNT];
+void player_create(Player *player, int tile_id);
+void player_load_from_level(Player *player, Snake snake_bodies[], Level *level);
+bool player_is_own_tile(Player *player, int tile_id);
+bool player_check_on_ground(Player *player, Level *level);
+void player_fall(Player *player, Level *level);
+void player_update(Player *player, int input_x, int input_y, Level *level);
+bool player_move(Player *player, int x, int y, Level *level);
 
 #endif

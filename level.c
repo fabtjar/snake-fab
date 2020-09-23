@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 
-struct Level level_create(char *level_file)
+Level level_create(char *level_file)
 {
     FILE *file = fopen(level_file, "r");
     char buffer[255];
@@ -29,7 +29,7 @@ struct Level level_create(char *level_file)
     }
     fclose(file);
     level_tiles[level_i] = '\0';
-    struct Level level;
+    Level level;
     level.length = strlen(level_tiles);
     level.width = 10;
 
@@ -41,7 +41,7 @@ struct Level level_create(char *level_file)
     return level;
 }
 
-int level_get_tile(struct Level *level, int x, int y)
+int level_get_tile(Level *level, int x, int y)
 {
     if (x < 0 || x > level->width - 1 || y < 0 || y > level->length / level->width - 1)
         return -1;
@@ -49,7 +49,7 @@ int level_get_tile(struct Level *level, int x, int y)
     return level->tiles[x % level->width + y * level->width];
 }
 
-bool level_set_tile(struct Level *level, int x, int y, int tile_id)
+bool level_set_tile(Level *level, int x, int y, int tile_id)
 {
     if (x < 0 || x > level->width - 1 || y < 0 || y > level->length / level->width - 1)
         return false;
@@ -59,7 +59,7 @@ bool level_set_tile(struct Level *level, int x, int y, int tile_id)
     return true;
 }
 
-int level_get_tile_index(struct Level *level, int tile_id)
+int level_get_tile_index(Level *level, int tile_id)
 {
     for (int i = 0; i < level->length; i++)
     {
@@ -69,7 +69,7 @@ int level_get_tile_index(struct Level *level, int tile_id)
     return -1;
 }
 
-int level_get_tile_count(struct Level *level, int tile_id)
+int level_get_tile_count(Level *level, int tile_id)
 {
     int tile_count = 0;
     for (int i = 0; i < level->length; i++)

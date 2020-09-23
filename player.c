@@ -2,16 +2,16 @@
 #include "level.h"
 #include <stdbool.h>
 
-bool player_push(struct Player *player, int dir_x, int dir_y, struct Level *level);
+bool player_push(Player *player, int dir_x, int dir_y, Level *level);
 
-void player_create(struct Player *player, int tile_id)
+void player_create(Player *player, int tile_id)
 {
     player->head.tile_id = tile_id;
     player->angle = PLAYER_DIR_RIGHT;
     player->on_ground = false;
 }
 
-void player_load_from_level(struct Player *player, struct Snake snake_bodies[], struct Level *level)
+void player_load_from_level(Player *player, Snake snake_bodies[], Level *level)
 {
     const int level_index = level_get_tile_index(level, player->head.tile_id);
     player->head.x = level_index % level->width;
@@ -20,7 +20,7 @@ void player_load_from_level(struct Player *player, struct Snake snake_bodies[], 
     snake_find_bodies(&player->head, snake_bodies, level);
 }
 
-bool player_is_own_tile(struct Player *player, int tile_id)
+bool player_is_own_tile(Player *player, int tile_id)
 {
     int player_tile_id = player->head.tile_id;
     return tile_id >= player_tile_id - 1 && tile_id <= player_tile_id + 1;
@@ -34,10 +34,10 @@ int player_get_from_tile(int tile_id)
     return -1;
 }
 
-bool player_check_on_ground(struct Player *player, struct Level *level)
+bool player_check_on_ground(Player *player, Level *level)
 {
     bool on_ground = false;
-    struct Snake *snake = &player->head;
+    Snake *snake = &player->head;
     while (snake && !on_ground)
     {
         int under_tile_id = level_get_tile(level, snake->x, snake->y + 1);
@@ -52,11 +52,11 @@ bool player_check_on_ground(struct Player *player, struct Level *level)
     return false;
 }
 
-void player_fall(struct Player *player, struct Level *level)
+void player_fall(Player *player, Level *level)
 {
     if (!player->on_ground)
     {
-        struct Snake *snake = &player->head;
+        Snake *snake = &player->head;
         while (snake)
         {
             level_set_tile(level, snake->x, snake->y, 0);
@@ -72,7 +72,7 @@ void player_fall(struct Player *player, struct Level *level)
     }
 }
 
-void player_update(struct Player *player, int input_x, int input_y, struct Level *level)
+void player_update(Player *player, int input_x, int input_y, Level *level)
 {
     if (input_x != 0)
         input_y = 0;
@@ -93,7 +93,7 @@ void player_update(struct Player *player, int input_x, int input_y, struct Level
     }
 }
 
-bool player_move(struct Player *player, int x, int y, struct Level *level)
+bool player_move(Player *player, int x, int y, Level *level)
 {
     int tile_id = level_get_tile(level, x, y);
 
@@ -121,10 +121,10 @@ bool player_move(struct Player *player, int x, int y, struct Level *level)
     return true;
 }
 
-bool player_push(struct Player *player, int dir_x, int dir_y, struct Level *level)
+bool player_push(Player *player, int dir_x, int dir_y, Level *level)
 {
     int tile_id;
-    struct Snake *snake;
+    Snake *snake;
 
     snake = &player->head;
     while (snake)

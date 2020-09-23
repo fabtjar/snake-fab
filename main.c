@@ -18,7 +18,7 @@
 
 int main()
 {
-    struct Level level = level_create("assets/level.map");
+    Level level = level_create("assets/level.map");
 
     for (int i = 0; i < PLAYER_COUNT; i++)
         player_create(&players[i], 4 + i * 3);
@@ -27,7 +27,7 @@ int main()
 
     int flash_amout = FLASH_MAX;
 
-    struct Snake snake_bodies[PLAYER_COUNT][PLAYER_SNAKE_BODY_MAX];
+    Snake snake_bodies[PLAYER_COUNT][PLAYER_SNAKE_BODY_MAX];
     for (int i = 0; i < PLAYER_COUNT; i++)
         player_load_from_level(&players[i], snake_bodies[i], &level);
 
