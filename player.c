@@ -124,8 +124,9 @@ bool player_move(struct Player *player, int x, int y, struct Level *level)
 bool player_push(struct Player *player, int dir_x, int dir_y, struct Level *level)
 {
     int tile_id;
+    struct Snake *snake;
 
-    struct Snake *snake = &player->head;
+    snake = &player->head;
     while (snake)
     {
         tile_id = level_get_tile(level, snake->x + dir_x, snake->y + dir_y);
@@ -135,10 +136,17 @@ bool player_push(struct Player *player, int dir_x, int dir_y, struct Level *leve
             return false;
     }
 
+    // Remove all the tiles from the level first so they don't
+    // remove other tiles added from within the body chain.
     snake = &player->head;
     while (snake)
     {
         level_set_tile(level, snake->x, snake->y, 0);
+        snake = snake->child;
+    }
+    snake = &player->head;
+    while (snake)
+    {
         snake->x += dir_x;
         snake->y += dir_y;
         level_set_tile(level, snake->x, snake->y, snake->tile_id);
