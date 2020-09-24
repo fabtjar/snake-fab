@@ -1,7 +1,9 @@
 #include "player.h"
 #include "level.h"
+#include <math.h>
 #include <stdbool.h>
 
+void player_set_init_angle(Player *player);
 bool player_push(Player *player, int dir_x, int dir_y, Level *level);
 
 void player_create(Player *player, int tile_id)
@@ -18,6 +20,18 @@ void player_load_from_level(Player *player, Snake snake_bodies[], Level *level)
     player->head.y = level_index / level->width;
 
     snake_find_bodies(&player->head, snake_bodies, level);
+    player_set_init_angle(player);
+}
+
+void player_set_init_angle(Player *player)
+{
+    // Can't determine an angle with just a head.
+    if (!player->head.child)
+        return;
+
+    double diff_x = player->head.x - player->head.child->x;
+    double diff_y = player->head.y - player->head.child->y;
+    player->angle = (int)(atan2(diff_y, diff_x) * 180 / M_PI) + 90; // +90 as sprite facing up
 }
 
 bool player_is_own_tile(Player *player, int tile_id)
