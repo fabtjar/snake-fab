@@ -42,14 +42,11 @@ bool player_check_on_ground(Player *player, Level *level)
     {
         int under_tile_id = level_get_tile(level, snake->x, snake->y + 1);
         if (under_tile_id != 0 && !player_is_own_tile(player, under_tile_id))
-        {
-            player->on_ground = true;
-            return true;
-        }
+            on_ground = true;
         snake = snake->child;
     }
-    player->on_ground = false;
-    return false;
+    player->on_ground = on_ground;
+    return on_ground;
 }
 
 void player_fall(Player *player, Level *level)

@@ -99,13 +99,8 @@ int main()
 
         bool all_on_ground = true;
         for (int i = 0; i < PLAYER_COUNT; i++)
-        {
             if (!player_check_on_ground(&players[i], &level))
-            {
                 all_on_ground = false;
-                break;
-            }
-        }
 
         if (!all_on_ground)
         {
