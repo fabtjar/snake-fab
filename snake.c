@@ -2,6 +2,13 @@
 #include "level.h"
 #include <stdbool.h>
 
+#define BODY_TILE_OFFSET -1
+#define BODY_TILE_DARKER_OFFSET 2
+
+// Check the level to see if a tile at the given position id matches body_tile_id.
+// If it is add it to the offets array and increase offset_n by 1.
+void add_find_body_offsets(int x, int y, int offsets_x[], int offsets_y[], int *offsets_n, Level *level, int body_tile_id);
+
 bool snake_move(Snake *snake, int x, int y, Level *level)
 {
     int last_x = snake->x;
@@ -17,59 +24,80 @@ bool snake_move(Snake *snake, int x, int y, Level *level)
     return true;
 }
 
+// Recursively find an adjacent tile of the same snake body and set it as the snake's child.
 void snake_find_bodies(Snake *snake, Snake snake_bodies[], Level *level)
 {
-    const int body_tile_id = snake->tile_id - 1;
+    const int body_tile_id = snake->tile_id + BODY_TILE_OFFSET;
     int snakes_found = 0;
 
     Snake *parent = snake;
     while (parent)
     {
-        int offset_x = 0;
-        int offset_y = 0;
+        int offsets_n = 0;
+        int offsets_x[4];
+        int offsets_y[4];
 
-        if (level_get_tile(level, parent->x, parent->y - 1) == body_tile_id)
-            offset_y = -1;
-        else if (level_get_tile(level, parent->x, parent->y + 1) == body_tile_id)
-            offset_y = 1;
-        else if (level_get_tile(level, parent->x - 1, parent->y) == body_tile_id)
-            offset_x = -1;
-        else if (level_get_tile(level, parent->x + 1, parent->y) == body_tile_id)
-            offset_x = 1;
+        add_find_body_offsets(parent->x, parent->y - 1, offsets_x, offsets_y, &offsets_n, level, body_tile_id);
+        add_find_body_offsets(parent->x, parent->y + 1, offsets_x, offsets_y, &offsets_n, level, body_tile_id);
+        add_find_body_offsets(parent->x - 1, parent->y, offsets_x, offsets_y, &offsets_n, level, body_tile_id);
+        add_find_body_offsets(parent->x + 1, parent->y, offsets_x, offsets_y, &offsets_n, level, body_tile_id);
 
-        const int body_x = parent->x + offset_x;
-        const int body_y = parent->y + offset_y;
+        int body_x, body_y;
 
-        bool already_found_body = 0;
-        for (int i = 0; i < snakes_found; i++)
+        // Only set the child if it's not already in the snake's body.
+        bool body_found = false;
+        for (int i = 0; i < offsets_n; i++)
         {
-            Snake *body = &snake_bodies[i];
-            if (body->x == body_x && body->y == body_y)
+            bool already_used = false;
+            for (int j = 0; j < snakes_found; j++)
             {
-                already_found_body = true;
+                Snake *body = &snake_bodies[j];
+                if (body->x == offsets_x[i] && body->y == offsets_y[i])
+                {
+                    already_used = true;
+                    break;
+                }
+            }
+            if (!already_used)
+            {
+                body_x = offsets_x[i];
+                body_y = offsets_y[i];
+                body_found = true;
                 break;
             }
         }
 
-        if ((offset_x != 0 || offset_y != 0) && !already_found_body)
+        // Must be the tail.
+        if (!body_found)
+            return;
+
+        Snake body = {
+            .tile_id = body_tile_id,
+            .x = body_x,
+            .y = body_y,
+        };
+
+        // Every other body tile will be darker.
+        if (snakes_found % 2 == 0)
         {
-            Snake body = {
-                .tile_id = body_tile_id,
-                .x = body_x,
-                .y = body_y,
-            };
-
-            if (snakes_found % 2 == 0)
-            {
-                body.tile_id += 2;
-                level_set_tile(level, body.x, body.y, body.tile_id);
-            }
-
-            snake_bodies[snakes_found] = body;
-            parent->child = &snake_bodies[snakes_found];
-            snakes_found++;
+            body.tile_id += BODY_TILE_DARKER_OFFSET;
+            level_set_tile(level, body.x, body.y, body.tile_id);
         }
 
+        snake_bodies[snakes_found] = body;
+        parent->child = &snake_bodies[snakes_found];
+        snakes_found++;
+
         parent = parent->child;
+    }
+}
+
+void add_find_body_offsets(int x, int y, int offsets_x[], int offsets_y[], int *offsets_n, Level *level, int body_tile_id)
+{
+    if (level_get_tile(level, x, y) == body_tile_id)
+    {
+        offsets_x[*offsets_n] = x;
+        offsets_y[*offsets_n] = y;
+        (*offsets_n)++;
     }
 }
