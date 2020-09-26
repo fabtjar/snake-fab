@@ -13,6 +13,8 @@
 #define JSON_BUFFER_SIZE 2048
 #define TILE_SIZE 20
 
+#define FALL_DELAY 32
+
 #define FLASH_MAX 255
 #define FLASH_REDUCE 20
 #define FADE_AMOUNT 100
@@ -100,7 +102,7 @@ int main()
 
         if (!player_check_all_on_ground(&level))
         {
-            SDL_Delay(100);
+            SDL_Delay(FALL_DELAY);
             player_update_falling(&level);
         }
         else if (input_x != 0 || input_y != 0)
