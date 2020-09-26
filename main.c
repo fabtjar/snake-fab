@@ -17,7 +17,7 @@
 
 #define FLASH_MAX 255
 #define FLASH_REDUCE 20
-#define FADE_AMOUNT 100
+#define FADE_AMOUNT 50
 
 int main()
 {
