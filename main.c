@@ -98,16 +98,10 @@ int main()
             }
         }
 
-        bool all_on_ground = true;
-        for (int i = 0; i < PLAYER_COUNT; i++)
-            if (!player_check_on_ground(&players[i], &level))
-                all_on_ground = false;
-
-        if (!all_on_ground)
+        if (!player_check_all_on_ground(&level))
         {
             SDL_Delay(100);
-            for (int i = 0; i < PLAYER_COUNT; i++)
-                player_fall(&players[i], &level);
+            player_update_falling(&level);
         }
         else if (input_x != 0 || input_y != 0)
         {

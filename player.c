@@ -2,8 +2,10 @@
 #include "level.h"
 #include <math.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
 void player_set_init_angle(Player *player);
+void player_check_on_ground(Player *player, Level *level);
 bool player_push(Player *player, int dir_x, int dir_y, Level *level, bool check_push, int player_pushing_id);
 
 void player_create(Player *player, int id)
@@ -49,39 +51,79 @@ int player_get_from_tile(int tile_id)
     return -1;
 }
 
-bool player_check_on_ground(Player *player, Level *level)
+bool player_check_all_on_ground(Level *level)
 {
-    bool on_ground = false;
-    Snake *snake = &player->head;
-    while (snake && !on_ground)
-    {
-        int under_tile_id = level_get_tile(level, snake->x, snake->y + 1);
-        if (under_tile_id != 0 && !player_is_own_tile(player, under_tile_id))
-            on_ground = true;
-        snake = snake->child;
-    }
-    player->on_ground = on_ground;
-    return on_ground;
+    for (int i = 0; i < PLAYER_COUNT; i++)
+        players[i].on_ground = false;
+
+    for (int i = 0; i < PLAYER_COUNT; i++)
+        if (!players[i].on_ground)
+            player_check_on_ground(&players[i], level);
+
+    for (int i = 0; i < PLAYER_COUNT; i++)
+        if (!players[i].on_ground)
+            return false;
+
+    return true;
 }
 
-void player_fall(Player *player, Level *level)
+void player_check_on_ground(Player *player, Level *level)
 {
-    if (!player->on_ground)
+    for (Snake *snake = &player->head; snake; snake = snake->child)
     {
-        Snake *snake = &player->head;
-        while (snake)
+        if (level_get_tile(level, snake->x, snake->y + 1) == 1)
         {
-            level_set_tile(level, snake->x, snake->y, 0);
-            snake = snake->child;
-        }
-        snake = &player->head;
-        while (snake)
-        {
-            snake->y++;
-            level_set_tile(level, snake->x, snake->y, snake->tile_id);
-            snake = snake->child;
+            player->on_ground = true;
+            break;
         }
     }
+
+    if (!player->on_ground)
+        return;
+
+    for (Snake *snake = &player->head; snake; snake = snake->child)
+    {
+        int over_tile_id = level_get_tile(level, snake->x, snake->y - 1);
+        if (over_tile_id > 1)
+        {
+            Player *other = player_find_from_tile(over_tile_id);
+            if (other->id == player->id || other->on_ground)
+                continue;
+
+            other->on_ground = true;
+            player_check_on_ground(other, level);
+        }
+    }
+}
+
+void player_update_falling(Level *level)
+{
+    for (int i = 0; i < PLAYER_COUNT; i++)
+        if (!players[i].on_ground)
+            player_set_level_tile(&players[i], level, true);
+
+    for (int i = 0; i < PLAYER_COUNT; i++)
+        if (!players[i].on_ground)
+            for (Snake *snake = &players[i].head; snake; snake = snake->child)
+                snake->y++;
+
+    for (int i = 0; i < PLAYER_COUNT; i++)
+        if (!players[i].on_ground)
+            player_set_level_tile(&players[i], level, false);
+}
+
+Player *player_find_from_tile(int tile_id)
+{
+    for (int i = 0; i < PLAYER_COUNT; i++)
+        if (player_is_own_tile(&players[i], tile_id))
+            return &players[i];
+    return NULL;
+}
+
+void player_set_level_tile(Player *player, Level *level, bool clear_tile)
+{
+    for (Snake *snake = &player->head; snake; snake = snake->child)
+        level_set_tile(level, snake->x, snake->y, clear_tile ? 0 : snake->tile_id);
 }
 
 void player_update(Player *player, int input_x, int input_y, Level *level)
