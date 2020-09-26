@@ -14,7 +14,8 @@
 #define TILE_SIZE 20
 
 #define FLASH_MAX 255
-#define FLASH_REDUCE 10
+#define FLASH_REDUCE 20
+#define FADE_AMOUNT 100
 
 int main()
 {
@@ -113,7 +114,6 @@ int main()
             player_update(&players[active_player], input_x, input_y, &level);
         }
 
-        SDL_SetRenderDrawColor(renderer, 255, 255, 255, flash_amout);
         if (flash_amout > 0)
             flash_amout -= FLASH_REDUCE;
         if (flash_amout < 0)
@@ -145,9 +145,21 @@ int main()
             if (!is_player_head)
                 SDL_RenderCopy(renderer, texture, &src_rect, &dest_rect);
 
-            if (player_is_own_tile(&players[active_player], tile_id))
+            // Draw flash/fade on players.
+            for (int i = 0; i < PLAYER_COUNT; i++)
+            {
+                if (!player_is_own_tile(&players[i], tile_id))
+                    continue;
+
+                if (i == active_player)
+                    SDL_SetRenderDrawColor(renderer, 255, 255, 255, flash_amout);
+                else
+                    SDL_SetRenderDrawColor(renderer, 0, 0, 0, FADE_AMOUNT);
+
                 SDL_RenderFillRect(renderer, &dest_rect);
+            }
         }
+
         SDL_RenderPresent(renderer);
         SDL_Delay(1000 / 60);
     }
