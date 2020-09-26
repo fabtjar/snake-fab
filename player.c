@@ -174,14 +174,7 @@ bool player_move(Player *player, int x, int y, Level *level)
     // cleared their position from the level.
     // Update level to show moved positions.
     for (int i = 0; i < PLAYER_COUNT; i++)
-    {
-        Snake *snake = &players[i].head;
-        while (snake)
-        {
-            level_set_tile(level, snake->x, snake->y, snake->tile_id);
-            snake = snake->child;
-        }
-    }
+        player_set_level_tile(&players[i], level, false);
 
     snake_move(&player->head, x, y, level);
 
@@ -224,18 +217,14 @@ bool player_push(Player *player, int dir_x, int dir_y, Level *level, bool check_
         snake = snake->child;
     }
 
-    snake = &player->head;
-    while (snake)
-    {
-        // Clear position off the level.
-        level_set_tile(level, snake->x, snake->y, 0);
+    player_set_level_tile(player, level, true);
 
+    for (Snake *snake = &player->head; snake; snake = snake->child)
+    {
         // Positions will be update on the level after all players are
         // cleared their posiition on the level to avoid overriding.
         snake->x += dir_x;
         snake->y += dir_y;
-
-        snake = snake->child;
     }
 
     return true;
