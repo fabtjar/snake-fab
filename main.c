@@ -133,6 +133,8 @@ int main()
             {
                 if (tile_id == players[i].head.tile_id)
                 {
+                    if (i != active_player)
+                        src_rect.x += TILE_SIZE * 2;
                     SDL_RenderCopyEx(renderer, texture, &src_rect, &dest_rect, players[i].angle, NULL, SDL_FLIP_NONE);
                     is_player_head = true;
                     break;
