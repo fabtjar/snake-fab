@@ -11,7 +11,7 @@ bool player_push(Player *player, int dir_x, int dir_y, Level *level, bool check_
 void player_create(Player *player, int id)
 {
     player->id = id;
-    player->head.tile_id = 4 + id * 3;
+    player->head.tile_id = id * 4 + 5;
     player->angle = PLAYER_DIR_RIGHT;
     player->on_ground = false;
 }

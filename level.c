@@ -19,10 +19,27 @@ Level level_create(char *level_file)
             if (c == ' ' || c == '\n')
                 continue;
 
-            // 'A' is a place holder for 10 as it doesn't fit in a single char.
-            // Replace with the char after '9' so it can be convert to 10 later on.
-            if (c == 'A')
-                c = ':';
+            switch (c)
+            {
+            case 'A':
+                c = '5';
+                break;
+            case 'a':
+                c = '4';
+                break;
+            case 'B':
+                c = '9';
+                break;
+            case 'b':
+                c = '8';
+                break;
+            case 'C':
+                c = '=';
+                break;
+            case 'c':
+                c = '<';
+                break;
+            }
 
             level_tiles[level_i++] = c;
         }
@@ -34,9 +51,7 @@ Level level_create(char *level_file)
     level.width = 10;
 
     for (int i = 0; i < level.length; i++)
-    {
         level.tiles[i] = level_tiles[i] - '0';
-    }
 
     return level;
 }
