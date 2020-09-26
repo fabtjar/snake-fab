@@ -4,11 +4,12 @@
 #include <stdbool.h>
 
 void player_set_init_angle(Player *player);
-bool player_push(Player *player, int dir_x, int dir_y, Level *level);
+bool player_push(Player *player, int dir_x, int dir_y, Level *level, bool check_push, int player_pushing_id);
 
-void player_create(Player *player, int tile_id)
+void player_create(Player *player, int id)
 {
-    player->head.tile_id = tile_id;
+    player->id = id;
+    player->head.tile_id = 4 + id * 3;
     player->angle = PLAYER_DIR_RIGHT;
     player->on_ground = false;
 }
@@ -123,8 +124,21 @@ bool player_move(Player *player, int x, int y, Level *level)
         int other_id = player_get_from_tile(tile_id);
         int dir_x = x - player->head.x;
         int dir_y = y - player->head.y;
-        if (!player_push(&players[other_id], dir_x, dir_y, level))
+        if (!player_push(&players[other_id], dir_x, dir_y, level, true, player->id))
             return false;
+    }
+
+    // Some players would have been pushed and
+    // cleared their position from the level.
+    // Update level to show moved positions.
+    for (int i = 0; i < PLAYER_COUNT; i++)
+    {
+        Snake *snake = &players[i].head;
+        while (snake)
+        {
+            level_set_tile(level, snake->x, snake->y, snake->tile_id);
+            snake = snake->child;
+        }
     }
 
     snake_move(&player->head, x, y, level);
@@ -132,35 +146,53 @@ bool player_move(Player *player, int x, int y, Level *level)
     return true;
 }
 
-bool player_push(Player *player, int dir_x, int dir_y, Level *level)
+bool player_push(Player *player, int dir_x, int dir_y, Level *level, bool check_push, int player_pushing_id)
 {
-    int tile_id;
     Snake *snake;
 
+    // Can't be pushed into walls.
     snake = &player->head;
     while (snake)
     {
-        tile_id = level_get_tile(level, snake->x + dir_x, snake->y + dir_y);
-        if (tile_id == 0 || player_is_own_tile(player, tile_id))
-            snake = snake->child;
-        else
+        if (level_get_tile(level, snake->x + dir_x, snake->y + dir_y) == 1)
             return false;
-    }
-
-    // Remove all the tiles from the level first so they don't
-    // remove other tiles added from within the body chain.
-    snake = &player->head;
-    while (snake)
-    {
-        level_set_tile(level, snake->x, snake->y, 0);
         snake = snake->child;
     }
+
+    // Check being pushed into other players.
     snake = &player->head;
     while (snake)
     {
+        int tile_id = level_get_tile(level, snake->x + dir_x, snake->y + dir_y);
+
+        // Another player.
+        if (check_push && tile_id > 1 && !player_is_own_tile(player, tile_id))
+        {
+            int other_id = player_get_from_tile(tile_id);
+
+            // The original pusher can't be pushed.
+            if (other_id == player_pushing_id)
+                return false;
+
+            // If the other player can't be pushed then nor can this one.
+            if (!player_push(&players[other_id], dir_x, dir_y, level, false, player_pushing_id))
+                return false;
+        }
+
+        snake = snake->child;
+    }
+
+    snake = &player->head;
+    while (snake)
+    {
+        // Clear position off the level.
+        level_set_tile(level, snake->x, snake->y, 0);
+
+        // Positions will be update on the level after all players are
+        // cleared their posiition on the level to avoid overriding.
         snake->x += dir_x;
         snake->y += dir_y;
-        level_set_tile(level, snake->x, snake->y, snake->tile_id);
+
         snake = snake->child;
     }
 

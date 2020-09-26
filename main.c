@@ -21,7 +21,7 @@ int main()
     Level level = level_create("assets/level.map");
 
     for (int i = 0; i < PLAYER_COUNT; i++)
-        player_create(&players[i], 4 + i * 3);
+        player_create(&players[i], i);
 
     int active_player = 0;
 

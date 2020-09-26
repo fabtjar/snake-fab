@@ -13,6 +13,7 @@
 
 typedef struct Player
 {
+    int id;
     Snake head;
     int angle;
     bool on_ground;
