@@ -3,6 +3,7 @@
 #include "snake.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <limits.h>
 #include <stdbool.h>
 #include <stdio.h>
 
@@ -15,7 +16,7 @@
 
 #define FALL_DELAY 32
 
-#define FLASH_MAX 255
+#define FLASH_MAX UCHAR_MAX
 #define FLASH_REDUCE 20
 #define FADE_AMOUNT 50
 
@@ -89,7 +90,7 @@ int main()
                     break;
                 case SDL_SCANCODE_SPACE:
                     active_player = (active_player + 1) % PLAYER_COUNT;
-                    flash_amout = 255;
+                    flash_amout = FLASH_MAX;
                     break;
                 default:
                     break;
@@ -150,7 +151,7 @@ int main()
                     continue;
 
                 if (i == active_player)
-                    SDL_SetRenderDrawColor(renderer, 255, 255, 255, flash_amout);
+                    SDL_SetRenderDrawColor(renderer, UCHAR_MAX, UCHAR_MAX, UCHAR_MAX, flash_amout);
                 else
                     SDL_SetRenderDrawColor(renderer, 0, 0, 0, FADE_AMOUNT);
 
