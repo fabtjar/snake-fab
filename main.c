@@ -11,6 +11,8 @@
 #define GAME_HEIGHT 200
 #define GAME_SCALE 3
 
+#define FRAME_RATE (1000 / 60)
+
 #define JSON_BUFFER_SIZE 2048
 #define TILE_SIZE 20
 
@@ -160,7 +162,7 @@ int main()
         }
 
         SDL_RenderPresent(renderer);
-        SDL_Delay(1000 / 60);
+        SDL_Delay(FRAME_RATE);
     }
 
     SDL_DestroyRenderer(renderer);
