@@ -9,9 +9,8 @@ Level level_create(char *level_file)
     char buffer[255];
     char level_tiles[255];
     int level_i = 0;
-    while (!feof(file))
+    while (fgets(buffer, 255, file))
     {
-        fgets(buffer, 255, file);
         int buffer_length = strlen(buffer);
         for (int i = 0; i < buffer_length; i++)
         {
