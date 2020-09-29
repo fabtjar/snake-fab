@@ -3,48 +3,45 @@
 #include <stdio.h>
 #include <string.h>
 
+#define LEVEL_MAX_COUNT 255
+
 Level level_create(char *level_file)
 {
     FILE *file = fopen(level_file, "r");
-    char buffer[255];
-    char level_tiles[255];
-    int level_i = 0;
-    while (fgets(buffer, 255, file))
+    char level_tiles[LEVEL_MAX_COUNT];
+    int i = 0;
+    char c;
+    while ((c = fgetc(file)) != EOF)
     {
-        int buffer_length = strlen(buffer);
-        for (int i = 0; i < buffer_length; i++)
+        if (c == ' ' || c == '\n')
+            continue;
+
+        switch (c)
         {
-            char c = buffer[i];
-            if (c == ' ' || c == '\n')
-                continue;
-
-            switch (c)
-            {
-            case 'A':
-                c = '5';
-                break;
-            case 'a':
-                c = '4';
-                break;
-            case 'B':
-                c = '9';
-                break;
-            case 'b':
-                c = '8';
-                break;
-            case 'C':
-                c = '=';
-                break;
-            case 'c':
-                c = '<';
-                break;
-            }
-
-            level_tiles[level_i++] = c;
+        case 'A':
+            c = '5';
+            break;
+        case 'a':
+            c = '4';
+            break;
+        case 'B':
+            c = '9';
+            break;
+        case 'b':
+            c = '8';
+            break;
+        case 'C':
+            c = '=';
+            break;
+        case 'c':
+            c = '<';
+            break;
         }
+
+        level_tiles[i++] = c;
     }
     fclose(file);
-    level_tiles[level_i] = '\0';
+    level_tiles[i] = '\0';
     Level level;
     level.length = strlen(level_tiles);
     level.width = 10;
