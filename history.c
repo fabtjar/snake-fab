@@ -62,10 +62,10 @@ void history_update(int active_player)
     }
 }
 
-void history_undo(Level *level, int *active_player)
+bool history_goto_prev(void)
 {
     if (!current_history->prev)
-        return;
+        return false;
 
     HistoryNode *old_history = current_history;
 
@@ -73,6 +73,11 @@ void history_undo(Level *level, int *active_player)
     free(old_history->positions);
     free(old_history);
 
+    return true;
+}
+
+void history_set_players(Level *level, int *active_player)
+{
     for (int i = 0; i < PLAYER_COUNT; i++)
         player_set_level_tile(&players[i], level, true);
 
@@ -88,6 +93,19 @@ void history_undo(Level *level, int *active_player)
         }
         player_set_level_tile(&players[j], level, false);
     }
+}
+
+void history_undo(Level *level, int *active_player)
+{
+    history_goto_prev();
+    history_set_players(level, active_player);
+}
+
+void history_restart(Level *level, int *active_player)
+{
+    while (history_goto_prev())
+        ;
+    history_set_players(level, active_player);
 }
 
 void history_terminate(char *message)

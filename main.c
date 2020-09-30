@@ -105,6 +105,10 @@ int main()
                         flash_amout = FLASH_MAX;
                 }
                 break;
+                case SDL_SCANCODE_R:
+                    history_restart(&level, &active_player);
+                    flash_amout = FLASH_MAX;
+                    break;
                 default:
                     break;
                 }
