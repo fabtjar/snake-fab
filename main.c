@@ -59,7 +59,7 @@ int main()
 
     int input_x, input_y;
 
-    history_init();
+    history_init(active_player);
 
     bool quit = false;
     while (!quit)
@@ -98,8 +98,13 @@ int main()
                     flash_amout = FLASH_MAX;
                     break;
                 case SDL_SCANCODE_BACKSPACE:
-                    history_undo(&level);
-                    break;
+                {
+                    int old_active_player = active_player;
+                    history_undo(&level, &active_player);
+                    if (old_active_player != active_player)
+                        flash_amout = FLASH_MAX;
+                }
+                break;
                 default:
                     break;
                 }
@@ -118,7 +123,7 @@ int main()
         {
             bool player_moved = player_update(&players[active_player], input_x, input_y, &level);
             if (player_moved)
-                history_update();
+                history_update(active_player);
         }
 
         if (flash_amout > 0)

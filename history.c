@@ -12,24 +12,25 @@ typedef struct history_node
 } HistoryNode;
 
 HistoryNode *current_history;
-int positions_count;
+int data_count;
 
 void history_terminate(char *message);
 
-void history_init(void)
+void history_init(int active_player)
 {
     int snake_count = 0;
     for (int i = 0; i < PLAYER_COUNT; i++)
         for (Snake *snake = &players[i].head; snake; snake = snake->child)
             snake_count++;
 
-    // X/Y for every snake block on the screen.
-    positions_count = snake_count * 2;
+    // X/Y for every snake tile and
+    // +1 for the active player.
+    data_count = snake_count * 2 + 1;
 
-    history_update();
+    history_update(active_player);
 }
 
-void history_update(void)
+void history_update(int active_player)
 {
     HistoryNode *history = malloc(sizeof(HistoryNode));
     if (!history)
@@ -37,7 +38,7 @@ void history_update(void)
 
     history->prev = NULL;
 
-    history->positions = malloc(positions_count * sizeof(int));
+    history->positions = malloc(data_count * sizeof(int));
     if (!history->positions)
     {
         free(history);
@@ -48,7 +49,9 @@ void history_update(void)
         history->prev = current_history;
     current_history = history;
 
-    int i = 0;
+    history->positions[0] = active_player;
+
+    int i = 1;
     for (int j = 0; j < PLAYER_COUNT; j++)
     {
         for (Snake *snake = &players[j].head; snake; snake = snake->child)
@@ -59,7 +62,7 @@ void history_update(void)
     }
 }
 
-void history_undo(Level *level)
+void history_undo(Level *level, int *active_player)
 {
     if (!current_history->prev)
         return;
@@ -73,7 +76,9 @@ void history_undo(Level *level)
     for (int i = 0; i < PLAYER_COUNT; i++)
         player_set_level_tile(&players[i], level, true);
 
-    int i = 0;
+    *active_player = current_history->positions[0];
+
+    int i = 1;
     for (int j = 0; j < PLAYER_COUNT; j++)
     {
         for (Snake *snake = &players[j].head; snake; snake = snake->child)

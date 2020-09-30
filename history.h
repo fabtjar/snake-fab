@@ -3,8 +3,8 @@
 
 #include "level.h"
 
-void history_init(void);
-void history_update(void);
-void history_undo(Level *level);
+void history_init(int active_player);
+void history_update(int active_player);
+void history_undo(Level *level, int *active_player);
 
 #endif
