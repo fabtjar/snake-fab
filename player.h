@@ -26,7 +26,7 @@ void player_update_falling(Level *level);
 Player *player_find_from_tile(int tile_id);
 bool player_check_all_on_ground(Level *level);
 void player_set_level_tile(Player *player, Level *level, bool clear_tile);
-void player_update(Player *player, int input_x, int input_y, Level *level);
+bool player_update(Player *player, int input_x, int input_y, Level *level);
 bool player_move(Player *player, int x, int y, Level *level);
 
 #endif

@@ -126,7 +126,7 @@ void player_set_level_tile(Player *player, Level *level, bool clear_tile)
         level_set_tile(level, snake->x, snake->y, clear_tile ? 0 : snake->tile_id);
 }
 
-void player_update(Player *player, int input_x, int input_y, Level *level)
+bool player_update(Player *player, int input_x, int input_y, Level *level)
 {
     if (input_x != 0)
         input_y = 0;
@@ -145,6 +145,8 @@ void player_update(Player *player, int input_x, int input_y, Level *level)
         else if (input_y < 0)
             player->angle = PLAYER_DIR_UP;
     }
+
+    return moved;
 }
 
 bool player_move(Player *player, int x, int y, Level *level)

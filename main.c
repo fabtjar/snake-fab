@@ -1,3 +1,4 @@
+#include "history.h"
 #include "level.h"
 #include "player.h"
 #include "snake.h"
@@ -58,6 +59,8 @@ int main()
 
     int input_x, input_y;
 
+    history_init();
+
     bool quit = false;
     while (!quit)
     {
@@ -94,6 +97,9 @@ int main()
                     active_player = (active_player + 1) % PLAYER_COUNT;
                     flash_amout = FLASH_MAX;
                     break;
+                case SDL_SCANCODE_BACKSPACE:
+                    history_undo(&level);
+                    break;
                 default:
                     break;
                 }
@@ -110,7 +116,9 @@ int main()
         }
         else if (input_x != 0 || input_y != 0)
         {
-            player_update(&players[active_player], input_x, input_y, &level);
+            bool player_moved = player_update(&players[active_player], input_x, input_y, &level);
+            if (player_moved)
+                history_update();
         }
 
         if (flash_amout > 0)
