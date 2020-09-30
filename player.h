@@ -21,6 +21,7 @@ typedef struct Player
 Player players[PLAYER_COUNT];
 void player_create(Player *player, int tile_id);
 void player_load_from_level(Player *player, Snake snake_bodies[], Level *level);
+void player_set_head_angle(Player *player);
 bool player_is_own_tile(Player *player, int tile_id);
 void player_update_falling(Level *level);
 Player *player_find_from_tile(int tile_id);

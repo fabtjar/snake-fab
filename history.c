@@ -86,12 +86,14 @@ void history_set_players(Level *level, int *active_player)
     int i = 1;
     for (int j = 0; j < PLAYER_COUNT; j++)
     {
-        for (Snake *snake = &players[j].head; snake; snake = snake->child)
+        Player *player = &players[j];
+        for (Snake *snake = &player->head; snake; snake = snake->child)
         {
             snake->x = current_history->positions[i++];
             snake->y = current_history->positions[i++];
         }
-        player_set_level_tile(&players[j], level, false);
+        player_set_level_tile(player, level, false);
+        player_set_head_angle(player);
     }
 }
 
