@@ -21,12 +21,13 @@ typedef struct Player
 Player players[PLAYER_COUNT];
 void player_create(Player *player, int tile_id);
 void player_load_from_level(Player *player, Snake snake_bodies[], Level *level);
+void player_set_head_angle(Player *player);
 bool player_is_own_tile(Player *player, int tile_id);
 void player_update_falling(Level *level);
 Player *player_find_from_tile(int tile_id);
 bool player_check_all_on_ground(Level *level);
 void player_set_level_tile(Player *player, Level *level, bool clear_tile);
-void player_update(Player *player, int input_x, int input_y, Level *level);
+bool player_update(Player *player, int input_x, int input_y, Level *level);
 bool player_move(Player *player, int x, int y, Level *level);
 
 #endif

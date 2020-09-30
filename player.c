@@ -4,7 +4,6 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-void player_set_init_angle(Player *player);
 void player_check_on_ground(Player *player, Level *level);
 bool player_push(Player *player, int dir_x, int dir_y, Level *level, bool check_push, int player_pushing_id);
 
@@ -23,10 +22,10 @@ void player_load_from_level(Player *player, Snake snake_bodies[], Level *level)
     player->head.y = level_index / level->width;
 
     snake_find_bodies(&player->head, snake_bodies, level);
-    player_set_init_angle(player);
+    player_set_head_angle(player);
 }
 
-void player_set_init_angle(Player *player)
+void player_set_head_angle(Player *player)
 {
     // Can't determine an angle with just a head.
     if (!player->head.child)
@@ -126,7 +125,7 @@ void player_set_level_tile(Player *player, Level *level, bool clear_tile)
         level_set_tile(level, snake->x, snake->y, clear_tile ? 0 : snake->tile_id);
 }
 
-void player_update(Player *player, int input_x, int input_y, Level *level)
+bool player_update(Player *player, int input_x, int input_y, Level *level)
 {
     if (input_x != 0)
         input_y = 0;
@@ -145,6 +144,8 @@ void player_update(Player *player, int input_x, int input_y, Level *level)
         else if (input_y < 0)
             player->angle = PLAYER_DIR_UP;
     }
+
+    return moved;
 }
 
 bool player_move(Player *player, int x, int y, Level *level)
