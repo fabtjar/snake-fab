@@ -2,7 +2,7 @@
 
 A clone of the [Snakebird](https://store.steampowered.com/app/357300/Snakebird/) mechanics using C and [SDL](https://www.libsdl.org/).
 
-![game](images/game.gif)
+![game](assets/game.gif)
 
 ## Setup for macOS
 
