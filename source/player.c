@@ -8,6 +8,8 @@
 #define M_PI 3.141592653
 #endif
 
+Player players[PLAYER_COUNT];
+
 void player_check_on_ground(Player *player, Level *level);
 bool player_push(Player *player, int dir_x, int dir_y, Level *level, bool check_push, int player_pushing_id);
 
