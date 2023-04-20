@@ -2,3 +2,7 @@
 .vscode
 build/
 source/*.[do]
+
+# Ignore vim files:
+*~
+*.sw[po]
