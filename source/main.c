@@ -97,6 +97,9 @@ int main()
                     active_player = (active_player + 1) % PLAYER_COUNT;
                     flash_amout = FLASH_MAX;
                     break;
+		case SDL_SCANCODE_ESCAPE:
+		    quit = true;
+		    break;
                 case SDL_SCANCODE_BACKSPACE:
                 {
                     int old_active_player = active_player;
