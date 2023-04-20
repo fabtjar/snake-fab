@@ -98,6 +98,7 @@ int main()
                     flash_amout = FLASH_MAX;
                     break;
 		case SDL_SCANCODE_ESCAPE:
+		case SDL_SCANCODE_Q:
 		    quit = true;
 		    break;
                 case SDL_SCANCODE_BACKSPACE:
